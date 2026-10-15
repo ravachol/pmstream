@@ -27,8 +27,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 // Usage:
 //   pm_stream --stream 80x40 --mode ascii  [--preset random|N]
 //   [--preset-interval 60] pm_stream --stream 80x40 --mode sixels [--cell-size
-//   8x16] [--fps 15]
-//             [--audio-device NAME] [--presets DIR]
+//   8x16] [--fps 15] [--audio-device NAME] [--presets DIR]
+//   pm_stream ... [--sendinfo]   show "author - preset" on the last row for 3s after each preset change
 //   pm_stream --list-devices
 //
 // Frame protocol: one frame per block, terminated by "\n\n".
@@ -65,6 +65,78 @@ static void on_signal(int s)
 {
         (void)s;
         g_quit = 1;
+}
+
+#define INFO_DURATION_SEC 3
+
+static int g_sendinfo = 0;
+static char g_info[512];
+static struct timespec g_info_until;
+
+static void on_preset_switched(bool is_hard_cut, unsigned int index, void *ud)
+{
+        (void)is_hard_cut;
+        projectm_playlist_handle pl = (projectm_playlist_handle)ud;
+
+        char *path = projectm_playlist_item(pl, index);
+        if (!path)
+                return;
+
+        const char *base = strrchr(path, '/');
+        base = base ? base + 1 : path;
+
+        snprintf(g_info, sizeof(g_info), "%s", base);
+        projectm_playlist_free_string(path);
+
+        // Strip extension (.milk / .prjm)
+        char *dot = strrchr(g_info, '.');
+        if (dot && dot != g_info)
+                *dot = '\0';
+
+        // Don't let a hostile filename inject terminal escapes.
+        for (char *p = g_info; *p; p++)
+                if ((unsigned char)*p < 0x20 || *p == 0x7f)
+                        *p = ' ';
+
+        clock_gettime(CLOCK_MONOTONIC, &g_info_until);
+        g_info_until.tv_sec += INFO_DURATION_SEC;
+}
+
+static int info_active(void)
+{
+        if (!g_sendinfo || !g_info[0])
+                return 0;
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        return now.tv_sec < g_info_until.tv_sec ||
+               (now.tv_sec == g_info_until.tv_sec && now.tv_nsec < g_info_until.tv_nsec);
+}
+
+static size_t format_info_row(char *out, int W, const char *text)
+{
+        size_t n = 0, bytes = 0;
+        int cps = 0;
+
+        while (text[bytes] && cps < W) {
+                bytes++;
+                while (((unsigned char)text[bytes] & 0xC0) == 0x80)
+                        bytes++;
+                cps++;
+        }
+
+        int pad_l = (W - cps) / 2;
+        int pad_r = W - cps - pad_l;
+
+        n += (size_t)sprintf(out + n, "\033[0;1;97m");
+        memset(out + n, ' ', (size_t)pad_l);
+        n += (size_t)pad_l;
+        memcpy(out + n, text, bytes);
+        n += bytes;
+        memset(out + n, ' ', (size_t)pad_r);
+        n += (size_t)pad_r;
+        memcpy(out + n, "\033[0m", 4);
+        n += 4;
+        return n;
 }
 
 // Output buffer, grown on demand (sixel frames vary in size).
@@ -111,9 +183,11 @@ static unsigned char calc_ascii_char(unsigned char r, unsigned char g,
 
 // px: RGBA, GL order (row 0 = bottom). Colored ASCII, one escape per color
 // change.
-static size_t encode_ascii(const uint8_t *px, int W, int H, char *out)
+static size_t encode_ascii(const uint8_t *px, int W, int H, char *out,
+                           const char *info)
 {
         size_t n = 0;
+        int last = info ? 1 : 0; // skip bottom pixel row when showing info
 
         for (int y = H - 1; y >= 0; y--) {
                 const uint8_t *row = px + (size_t)y * W * 4;
@@ -138,6 +212,11 @@ static size_t encode_ascii(const uint8_t *px, int W, int H, char *out)
                 n += 5;
         }
 
+        if (info) {
+                n += format_info_row(out + n, W, info);
+                out[n++] = '\n';
+        }
+
         out[n++] = '\n';
         return n;
 }
@@ -157,6 +236,7 @@ static ChafaCanvasConfig *g_cfg = NULL;
 static ChafaSymbolMap *g_symbol_map = NULL;
 static uint8_t *g_flip = NULL;
 static size_t g_flip_cap = 0;
+static int g_cols = 0, g_rows = 0, g_cell_h = 0;
 
 static void detect_terminal(ChafaTermInfo **term_info_out,
                             ChafaCanvasMode *mode_out,
@@ -232,6 +312,10 @@ static int sixel_init(int cols, int rows, int cell_w, int cell_h, int PW,
             PH <= 0)
                 return -1;
 
+        g_cols = cols;
+        g_rows = rows;
+        g_cell_h = cell_h;
+
         ChafaCanvasMode mode;
         ChafaPixelMode pixel_mode;
         ChafaPassthrough passthrough;
@@ -276,7 +360,7 @@ fail:
 }
 
 // px: RGBA, GL order. Returns bytes placed in g_buf (0 = skip this frame).
-static size_t encode_sixel(const uint8_t *px, int PW, int PH)
+static size_t encode_sixel(const uint8_t *px, int PW, int PH, const char *info)
 {
         if (!px || !g_flip || !g_cfg || PW <= 0 || PH <= 0)
                 return 0;
@@ -295,6 +379,13 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH)
                 g_flip = new_flip;
                 g_flip_cap = pixel_bytes;
         }
+
+        int info_rows = (info && g_rows >= 2) ? 1 : 0;
+        if (!info_rows)
+                info = NULL;
+        int use_rows = g_rows - info_rows;
+        int use_PH = PH - info_rows * g_cell_h;
+        chafa_canvas_config_set_geometry(g_cfg, g_cols, use_rows);
 
         // GL bottom-up -> Chafa top-down; force opaque alpha.
         for (int y = 0; y < PH; y++) {
@@ -318,7 +409,7 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH)
 #if CHAFA_VERSION_CUR_STABLE >= G_ENCODE_VERSION(1, 14)
 
         ChafaFrame *frame =
-            chafa_frame_new(g_flip, CHAFA_PIXEL_RGBA8_UNASSOCIATED, PW, PH, PW * 4);
+            chafa_frame_new(g_flip, CHAFA_PIXEL_RGBA8_UNASSOCIATED, PW, use_PH, PW * 4);
 
         if (frame) {
                 ChafaImage *image = chafa_image_new();
@@ -352,7 +443,7 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH)
 #else
 
         chafa_canvas_draw_all_pixels(canvas, CHAFA_PIXEL_RGBA8_UNASSOCIATED, g_flip,
-                                     PW, PH, PW * 4);
+                                     PW, use_PH, PW * 4);
         s = chafa_canvas_print(canvas, g_tinfo);
 
 #endif
@@ -364,18 +455,32 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH)
 
         // Preserve Chafa's output bytes; append the frame delimiter.
         size_t len = s->len;
-
         while (len > 0 && s->str[len - 1] == '\n')
                 len--;
 
-        if (ensure_cap(len + 3) != 0) {
+        size_t extra = info ? strlen(info) + 2 * (size_t)g_cols + 64 : 0;
+        if (ensure_cap(len + extra + 3) != 0) {
                 g_string_free(s, TRUE);
                 return 0;
         }
 
-        memcpy(g_buf, s->str, len);
+        size_t n = 0;
 
-        size_t n = len;
+        if (info) {
+                g_buf[n++] = '\033';
+                g_buf[n++] = '7';            // save cursor (viz origin)
+        }
+
+        memcpy(g_buf + n, s->str, len);
+        n += len;
+
+        if (info) {
+                g_buf[n++] = '\033';
+                g_buf[n++] = '8';            // restore cursor to origin
+                n += (size_t)sprintf(g_buf + n, "\033[%dB", g_rows - 1); // down to last row
+                n += format_info_row(g_buf + n, g_cols, info);
+        }
+
         g_buf[n++] = '\n';
         g_buf[n++] = '\n';
         g_buf[n] = '\0';
@@ -451,7 +556,7 @@ static int egl_init(void)
                                    EGL_CONTEXT_OPENGL_PROFILE_MASK,
                                    EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
                                    EGL_NONE};
-                                   
+
         g_ctx = eglCreateContext(g_dpy, cfg, EGL_NO_CONTEXT, ctx_attr);
 
         if (g_ctx == EGL_NO_CONTEXT) {
@@ -504,10 +609,9 @@ static int fbo_init(int w, int h)
 
 static projectm_handle g_pm;
 
-
 #include <pthread.h>
-#include <pulse/simple.h>
 #include <pulse/error.h>
+#include <pulse/simple.h>
 
 static projectm_handle g_pm;
 static pa_simple *g_pa = NULL;
@@ -661,6 +765,8 @@ int main(int argc, char **argv)
                 else if ((!strcmp(argv[i], "--presets") || !strcmp(argv[i], "-p")) &&
                          i + 1 < argc)
                         preset_dir = argv[++i];
+                else if (!strcmp(argv[i], "--sendinfo"))
+                        g_sendinfo = 1;                        
                 else if (!strcmp(argv[i], "-c") && i + 1 < argc)
                         i++; // chroma config path: ignored here
         }
@@ -747,6 +853,8 @@ int main(int argc, char **argv)
         projectm_set_preset_duration(g_pm, interval);
 
         projectm_playlist_handle pl = projectm_playlist_create(g_pm);
+        if (g_sendinfo)
+                projectm_playlist_set_preset_switched_event_callback(pl, on_preset_switched, pl);
         uint32_t count = projectm_playlist_add_path(pl, preset_dir, true, false);
         fprintf(stderr, "loaded %u presets from %s\n", count, preset_dir);
 
@@ -785,8 +893,10 @@ int main(int argc, char **argv)
                 glPixelStorei(GL_PACK_ALIGNMENT, 1);
                 glReadPixels(0, 0, RW, RH, GL_RGBA, GL_UNSIGNED_BYTE, px);
 
-                size_t n = (mode == MODE_SIXELS) ? encode_sixel(px, RW, RH)
-                                                 : encode_ascii(px, W, H, g_buf);
+                const char *info = info_active() ? g_info : NULL;
+
+size_t n = (mode == MODE_SIXELS) ? encode_sixel(px, RW, RH, info)
+                                                 : encode_ascii(px, W, H, g_buf, info);
 
                 if (n > 0) {
                         if (fwrite(g_buf, 1, n, out) != n || fflush(out) != 0)
