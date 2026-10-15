@@ -39,6 +39,12 @@ gcc -O2 -o pmstream pmstream.c \
     -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL
 ```
 
+## Install
+
+```sh
+sudo cp pmstram /usr/local/bin
+```
+
 ## Usage
 
 ```sh
