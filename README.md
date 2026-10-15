@@ -65,6 +65,7 @@ pmstream --list-devices
 | `--cell-size WxH` | Cell size in pixels (sixels only) | Detected from terminal, else `8x16` |
 | `--preset random\|N` | Shuffle presets, or pin to preset number `N` | `random` |
 | `--preset-interval S` | Seconds between preset changes | `25` |
+| `--sendinfo` | Displays author and preset name on the bottom row for 3 seconds |
 | `--presets DIR`, `-p DIR` | Preset directory | Searches `~/.local/share/projectM/presets` and `/usr/(local/)share/projectM/presets` |
 | `--audio-device NAME` | SDL audio capture device | System default | |
 
