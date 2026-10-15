@@ -101,3 +101,8 @@ Frames go to the original stdout. Anything else the program prints (log messages
 ## License
 
 GPLv2. Copyright (C) 202 Ravachol.
+
+## Credits
+
+* ProjectM by projectM Team - https://github.com/projectM-visualizer/projectm
+* Chafa by Hans Petter Jansson - https://hpjansson.org/chafa/
