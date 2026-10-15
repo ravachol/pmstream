@@ -16,7 +16,7 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 ## How to use with kew
 
 1. Install [kew](https://kewplayer.com/download.html) manually.
-2. Install [ProjectM](https://github.com/projectM-visualizer/projectm).
+2. Install [ProjectM](https://github.com/projectM-visualizer/projectm/blob/master/docs/building.rst).
 3. Install [ProjectM Presets](https://github.com/projectM-visualizer/presets-cream-of-the-crop).
 4. Install pmstream.
 5. Edit kewrc and set visualizationsPath="the path with the presets". Deleting the kewrc and starting/quitting kew makes this variable appear in kewrc after kew v4.4.2.
