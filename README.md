@@ -105,5 +105,5 @@ Frames go to the original stdout. Anything else the program prints (log messages
 
 ## License
 
-GPLv2. Copyright (C) 202 Ravachol.
+GPLv2. Copyright (C) 2026 Ravachol.
 
