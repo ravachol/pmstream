@@ -44,7 +44,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-#include <SDL2/SDL.h>
 #include <chafa.h>
 #include <projectM-4/playlist.h>
 #include <projectM-4/projectM.h>
@@ -504,59 +503,86 @@ static int fbo_init(int w, int h)
 /* ---------------------------------------------------------------- audio */
 
 static projectm_handle g_pm;
-static SDL_AudioDeviceID g_adev;
 
-static void audio_cb(void *ud, Uint8 *stream, int len)
+
+#include <pthread.h>
+#include <pulse/simple.h>
+#include <pulse/error.h>
+
+static projectm_handle g_pm;
+static pa_simple *g_pa = NULL;
+static pthread_t g_audio_thr;
+static int g_audio_running = 0;
+
+static pthread_mutex_t g_audio_lock = PTHREAD_MUTEX_INITIALIZER;
+static int g_audio_stop = 0;
+
+static void *audio_thread(void *ud)
 {
         (void)ud;
-        // projectm_pcm_add_float is safe to call from the audio thread.
-        projectm_pcm_add_float(g_pm, (const float *)stream,
-                               (unsigned int)(len / (2 * sizeof(float))),
-                               PROJECTM_STEREO);
-}
+        float buf[512 * 2];
+        int err;
 
-static void list_devices(void)
-{
-        if (SDL_Init(SDL_INIT_AUDIO) != 0)
-                return;
+        for (;;) {
+                if (pa_simple_read(g_pa, buf, sizeof(buf), &err) < 0) {
+                        fprintf(stderr, "pa_simple_read: %s\n", pa_strerror(err));
+                        break;
+                }
 
-        int n = SDL_GetNumAudioDevices(1);
-
-        for (int i = 0; i < n; i++)
-                printf("%s\n", SDL_GetAudioDeviceName(i, 1));
+                pthread_mutex_lock(&g_audio_lock);
+                if (g_audio_stop) {
+                        pthread_mutex_unlock(&g_audio_lock);
+                        break;
+                }
+                projectm_pcm_add_float(g_pm, buf, 512, PROJECTM_STEREO);
+                pthread_mutex_unlock(&g_audio_lock);
+        }
+        return NULL;
 }
 
 static int audio_start(const char *device)
 {
-        if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-                fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
+        // NULL/empty = monitor of whatever the default output is.
+        const char *src = (device && *device) ? device : "@DEFAULT_MONITOR@";
+
+        static const pa_sample_spec ss = {
+            .format = PA_SAMPLE_FLOAT32LE,
+            .rate = 44100,
+            .channels = 2,
+        };
+        // Small fragments for low latency.
+        pa_buffer_attr attr = {
+            .maxlength = (uint32_t)-1,
+            .tlength = (uint32_t)-1,
+            .prebuf = (uint32_t)-1,
+            .minreq = (uint32_t)-1,
+            .fragsize = 512 * 2 * sizeof(float),
+        };
+
+        int err;
+        g_pa = pa_simple_new(NULL, "pmstream", PA_STREAM_RECORD, src,
+                             "visualizer", &ss, NULL, &attr, &err);
+        if (!g_pa) {
+                fprintf(stderr, "pa_simple_new(%s): %s\n", src, pa_strerror(err));
                 return -1;
         }
-        SDL_AudioSpec want, have;
-        SDL_zero(want);
-        want.freq = 44100;
-        want.format = AUDIO_F32SYS;
-        want.channels = 2;
-        want.samples = 512;
-        want.callback = audio_cb;
 
-        g_adev = SDL_OpenAudioDevice(device && *device ? device : NULL, 0, &want,
-                                     &have, 0);
+        fprintf(stderr, "capturing from: %s\n", src);
 
-        if (!g_adev) {
-                fprintf(stderr, "Failed to opbtain audio device. SDL_OpenAudioDevice: %s\n",
-                        SDL_GetError());
+        if (pthread_create(&g_audio_thr, NULL, audio_thread, NULL) != 0) {
+                pa_simple_free(g_pa);
+                g_pa = NULL;
                 return -1;
         }
-
-        fprintf(stderr,
-                "Opened audio device ID: %u\n"
-                "Obtained format: %d Hz, format=0x%x, channels=%u, samples=%u\n",
-                (unsigned)g_adev, have.freq, have.format, have.channels,
-                have.samples);
-
-        SDL_PauseAudioDevice(g_adev, 0);
+        g_audio_running = 1;
         return 0;
+}
+
+static void audio_stop(void)
+{
+        pthread_mutex_lock(&g_audio_lock);
+        g_audio_stop = 1;
+        pthread_mutex_unlock(&g_audio_lock);
 }
 
 /* ----------------------------------------------------------------- misc */
@@ -609,10 +635,7 @@ int main(int argc, char **argv)
         const char *preset_dir = NULL;
 
         for (int i = 1; i < argc; i++) {
-                if (!strcmp(argv[i], "--list-devices")) {
-                        list_devices();
-                        return 0;
-                } else if (!strcmp(argv[i], "--stream") && i + 1 < argc)
+                if (!strcmp(argv[i], "--stream") && i + 1 < argc)
                         sscanf(argv[++i], "%dx%d", &W, &H);
                 else if (!strcmp(argv[i], "--mode") && i + 1 < argc) {
                         const char *v = argv[++i];
@@ -773,8 +796,7 @@ int main(int argc, char **argv)
                 sleep_until(&next, period_ns);
         }
 
-        if (g_adev)
-                SDL_CloseAudioDevice(g_adev);
+        audio_stop();
 
         projectm_playlist_destroy(pl);
         projectm_destroy(g_pm);
@@ -783,7 +805,6 @@ int main(int argc, char **argv)
                 sixel_shutdown();
 
         egl_shutdown();
-        SDL_Quit();
         free(px);
         free(g_buf);
 

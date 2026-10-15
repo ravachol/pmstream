@@ -6,7 +6,7 @@ Technical details:
 
 Run projectm headless and stream the rendered frames to stdout as ASCII or sixels. It is built to feed music visualizations to the terminal music player [kew](https://kewplayer.com), but works with anything that can read the frame protocol below.
 
-No window is needed: pmstream renders offscreen through a surfaceless EGL context, listens to an audio input device via SDL2, and writes each frame to stdout.
+No window is needed: pmstream renders offscreen through a surfaceless EGL context, listens to an audio input device, and writes each frame to stdout.
 
 FOR NOW THIS WORKS ON LINUX ONLY.
 
@@ -28,7 +28,6 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 ## Dependencies
 
 - [projectM](https://github.com/projectM-visualizer/projectm) (including `projectM-4-playlist`)
-- SDL2
 - [chafa](https://hpjansson.org/chafa/) (sixel mode)
 - EGL and OpenGL (e.g. Mesa)
 - A set of projectM presets
@@ -37,9 +36,10 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 
 ```sh
 gcc -O2 -o pmstream pmstream.c \
-    -I/usr/local/include $(pkg-config --cflags --libs sdl2 chafa) \
+    -I/usr/local/include $(pkg-config --cflags --libs chafa) \
     -L/usr/local/lib -Wl,-rpath,/usr/local/lib \
-    -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL
+    -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL \
+    -lpulse-simple -lpulse -lpthread
 ```
 
 ## Install
@@ -66,8 +66,7 @@ pmstream --list-devices
 | `--preset random\|N` | Shuffle presets, or pin to preset number `N` | `random` |
 | `--preset-interval S` | Seconds between preset changes | `25` |
 | `--presets DIR`, `-p DIR` | Preset directory | Searches `~/.local/share/projectM/presets` and `/usr/(local/)share/projectM/presets` |
-| `--audio-device NAME` | SDL audio capture device | System default |
-| `--list-devices` | Print available capture devices and exit | |
+| `--audio-device NAME` | SDL audio capture device | System default | |
 
 Pass the name of a monitor/loopback device to `--audio-device` to visualize what is currently playing.
 
