@@ -98,11 +98,12 @@ Each frame is one block terminated by `\n\n`.
 
 Frames go to the original stdout. Anything else the program prints (log messages, warnings) goes to stderr. Note that kew drops frames of 8 MiB or more, so keep sixel sizes reasonable.
 
-## License
-
-GPLv2. Copyright (C) 202 Ravachol.
-
 ## Credits
 
 * ProjectM by projectM Team - https://github.com/projectM-visualizer/projectm
 * Chafa by Hans Petter Jansson - https://hpjansson.org/chafa/
+
+## License
+
+GPLv2. Copyright (C) 202 Ravachol.
+
