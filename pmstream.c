@@ -325,9 +325,6 @@ static int sixel_init(int cols, int rows, int cell_w, int cell_h, int PW,
         if (!g_tinfo || !g_symbol_map)
                 goto fail;
 
-        // force SIXEL output.
-        pixel_mode = CHAFA_PIXEL_MODE_SIXELS;
-
         const gchar *term_name = chafa_term_info_get_name(g_tinfo);
         if (term_name && strstr(term_name, "tmux") != NULL)
                 mode = CHAFA_CANVAS_MODE_TRUECOLOR;
