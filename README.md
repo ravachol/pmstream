@@ -10,12 +10,12 @@ No window is needed: pmstream renders offscreen through a surfaceless EGL contex
 
 FOR NOW THIS WORKS ON LINUX ONLY.
 
-THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo develop branch to try this.
+THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manually.
 
 
 ## How to use with kew
 
-1. Install [kew](https://kewplayer.com/download.html).
+1. Install [kew](https://kewplayer.com/download.html) manually.
 2. Install [ProjectM](https://github.com/projectM-visualizer/projectm).
 3. Install [ProjectM Presets](https://github.com/projectM-visualizer/presets-cream-of-the-crop).
 4. Install pmstream.
