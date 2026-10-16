@@ -18,14 +18,12 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 ## How to use with kew
 
 1. Install [kew](https://kewplayer.com/download.html) manually.
-2. Install [ProjectM Presets](https://github.com/projectM-visualizer/presets-cream-of-the-crop).
-3. Install pmstream and projectM by running install.sh.
+2. Run install_linux.sh.
 
 ```sh
-./install.sh
+./install_linux.sh
 ```
-4. Edit kewrc and set visualizationsPath="the path with the presets". Deleting the kewrc and starting/quitting kew makes this variable appear in kewrc after kew v4.4.2.
-5. Start kew and play some music, press c on track view to start/switch visualizations. press b to switch back to album covers.
+3. Run kew and play some music, press c on track view to start/switch visualizations. press b to switch back to album covers.
 
 ## Dependencies
 
@@ -34,7 +32,7 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 - EGL and OpenGL (e.g. Mesa)
 - A set of projectM presets
 
-## Build
+## Manual Build
 
 ```sh
 gcc -O2 -o pmstream pmstream.c \
