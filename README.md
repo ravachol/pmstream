@@ -21,6 +21,10 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 2. Run install_linux.sh.
 
 ```sh
+git clone https://codeberg.org/ravachol/pmstream.git
+
+cd pmstream
+
 ./install_linux.sh
 ```
 3. Run kew and play some music, press c on track view to start/switch visualizations. press b to switch back to album covers.
