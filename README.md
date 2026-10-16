@@ -49,7 +49,7 @@ gcc -O2 -o pmstream pmstream.c \
 ## Manual Install
 
 ```sh
-sudo cp pmstram /usr/local/bin
+sudo cp pmstream /usr/local/bin
 ```
 
 ## Usage
