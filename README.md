@@ -46,7 +46,7 @@ gcc -O2 -o pmstream pmstream.c \
     -lpulse-simple -lpulse -lpthread
 ```
 
-## Install
+## Manual Install
 
 ```sh
 sudo cp pmstram /usr/local/bin
