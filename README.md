@@ -17,7 +17,7 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 
 ## How to use with kew
 
-1. Install [kew](https://kewplayer.com/download.html) manually.
+1. Install [kew](https://kewplayer.com/download.html) manually or at least version 4.4.2.
 2. Run install_linux.sh. This will install projectM, Cream of the Crop Preset Pack and pmstream.
 
 ```sh
