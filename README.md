@@ -1,6 +1,6 @@
 # pmstream
 
-Run [projectM](https://github.com/projectM-visualizer/projectm) winamp/milkdrop style visualizations inside kew.
+Run [projectM](https://github.com/projectM-visualizer/projectm) winamp style visualizations in the terminal or inside kew.
 
 [Watch the demo on YouTube](https://www.youtube.com/watch?v=ogAKuaRk7aU)
 
