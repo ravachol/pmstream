@@ -19,6 +19,8 @@ THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manua
 
 Run install_linux.sh. This will install projectM, Cream of the Crop Preset Pack and pmstream.
 
+If you installed kew first you'll have the necessary dependencies like chafa, otherwise install chafa.
+
 ```sh
 git clone https://codeberg.org/ravachol/pmstream.git
 
