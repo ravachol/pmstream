@@ -4,6 +4,11 @@ Run [projectM](https://github.com/projectM-visualizer/projectm) winamp style vis
 
 [Watch the demo on YouTube](https://www.youtube.com/watch?v=ogAKuaRk7aU)
 
+<div align="center">
+    <img src="images/screenshot.png" alt="ProjectM running in the terminal using pmstream" />
+</div>
+<br /><br />
+
 Technical details:
 
 Run projectm headless and stream the rendered frames to stdout as ASCII or sixels. It is built to feed music visualizations to the terminal music player [kew](https://kewplayer.com), but works with anything that can read the frame protocol below.
