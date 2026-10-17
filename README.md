@@ -10,9 +10,9 @@ Run projectm headless and stream the rendered frames to stdout as ASCII or sixel
 
 No window is needed: pmstream renders offscreen through a surfaceless EGL context, listens to an audio input device, and writes each frame to stdout.
 
-FOR NOW THIS WORKS ON LINUX ONLY.
+FOR NOW THIS WORKS IN LINUX ONLY.
 
-THIS WILL WORK ON KEW 4.4.2, for now you need to install kew from the repo manually.
+THIS WORKS WITH KEW 4.4.2 OR MANUAL BUILD OF KEW FROM THE MAIN REPO.
 
 
 ## How to install
