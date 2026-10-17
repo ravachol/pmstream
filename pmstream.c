@@ -474,7 +474,7 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH, const char *info)
         if (info) {
                 g_buf[n++] = '\033';
                 g_buf[n++] = '8';            // restore cursor to origin
-                n += (size_t)sprintf(g_buf + n, "\033[%dB", g_rows - 1); // down to last row
+                n += (size_t)sprintf(g_buf + n, "\033[%dB\033[%dX", g_rows - 1); // down to last row
                 n += format_info_row(g_buf + n, g_cols, info);
         }
 
