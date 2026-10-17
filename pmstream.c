@@ -465,16 +465,24 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH, const char *info)
 
         if (info) {
                 g_buf[n++] = '\033';
-                g_buf[n++] = '7';            // save cursor (viz origin)
+                g_buf[n++] = '7'; // save cursor (viz origin)
         }
 
         memcpy(g_buf + n, s->str, len);
         n += len;
 
+        const int is_kitty = chafa_canvas_config_get_pixel_mode(g_cfg) == CHAFA_PIXEL_MODE_KITTY;
+        size_t clear_len = is_kitty ? sizeof(KITTY_CLEAR) - 1 : 0;
+
         if (info) {
                 g_buf[n++] = '\033';
-                g_buf[n++] = '8';            // restore cursor to origin
-                n += (size_t)sprintf(g_buf + n, "\033[%dB\033[%dX", g_rows - 1); // down to last row
+                g_buf[n++] = '8'; // restore cursor to origin
+
+                if (is_kitty)
+                        n += (size_t)sprintf(g_buf + n, "\033[%dB\033[%dX", g_rows - 1); // down to last row
+                else
+                        n += (size_t)sprintf(g_buf + n, "\033[%dB", g_rows - 1); // down to last row
+
                 n += format_info_row(g_buf + n, g_cols, info);
         }
 
@@ -763,7 +771,7 @@ int main(int argc, char **argv)
                          i + 1 < argc)
                         preset_dir = argv[++i];
                 else if (!strcmp(argv[i], "--sendinfo"))
-                        g_sendinfo = 1;                        
+                        g_sendinfo = 1;
                 else if (!strcmp(argv[i], "-c") && i + 1 < argc)
                         i++; // chroma config path: ignored here
         }
@@ -892,7 +900,7 @@ int main(int argc, char **argv)
 
                 const char *info = info_active() ? g_info : NULL;
 
-size_t n = (mode == MODE_SIXELS) ? encode_sixel(px, RW, RH, info)
+                size_t n = (mode == MODE_SIXELS) ? encode_sixel(px, RW, RH, info)
                                                  : encode_ascii(px, W, H, g_buf, info);
 
                 if (n > 0) {
