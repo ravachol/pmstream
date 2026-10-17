@@ -472,7 +472,6 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH, const char *info)
         n += len;
 
         const int is_kitty = chafa_canvas_config_get_pixel_mode(g_cfg) == CHAFA_PIXEL_MODE_KITTY;
-        size_t clear_len = is_kitty ? sizeof(KITTY_CLEAR) - 1 : 0;
 
         if (info) {
                 g_buf[n++] = '\033';
