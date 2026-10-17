@@ -11,7 +11,7 @@ git submodule update
 # configure cmake for projectM
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_PLAYLIST=ON ..
 
 # make and install projectM
 cmake --build . -- -j && sudo cmake --build . --target install
