@@ -24,10 +24,10 @@ THIS WORKS WITH KEW 4.4.2 OR MANUAL BUILD OF KEW FROM THE MAIN REPO.
 
 Run install_linux.sh. This will install projectM, Cream of the Crop Preset Pack and pmstream.
 
-If you installed kew first you'll have the necessary dependencies like chafa, otherwise install chafa.
+If you installed kew first you'll have the necessary dependencies like chafa, otherwise install chafa (right now the best way is to install it from the master if you are on debian: https://github.com/hpjansson/chafa/).
 
 ```sh
-sudo apt install libegl-dev pkg-config cmake libglib2.0-dev libpulse-dev libchafa-dev # or equivalent - this is for debian
+sudo apt install libegl-dev pkg-config cmake libglib2.0-dev libpulse-dev  # or equivalent - this is for debian
 
 git clone https://codeberg.org/ravachol/pmstream.git
 
