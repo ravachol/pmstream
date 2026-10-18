@@ -1,4 +1,5 @@
 #!/usr/bin/sh
+set -e
 
 # download projectM source
 mkdir projectM
@@ -14,7 +15,8 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_PLAYLIST=ON ..
 
 # make and install projectM
-cmake --build . -- -j && sudo cmake --build . --target install
+cmake --build . -- -j
+sudo cmake --build . --target install
 
 # make and install pmstream
 cd ../../
