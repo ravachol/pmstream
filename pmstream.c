@@ -19,10 +19,11 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 // Build (Linux):
-//   gcc -O2 -o pm_stream pm_stream.c \
-//       -I/usr/local/include $(pkg-config --cflags --libs sdl2 chafa) \
-//       -L/usr/local/lib -Wl,-rpath,/usr/local/lib \
-//       -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL
+// gcc -O2 -o pmstream pmstream.c \
+//    -I/usr/local/include $(pkg-config --cflags --libs chafa) \
+//    -L/usr/local/lib -Wl,-rpath,/usr/local/lib \
+//    -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL \
+//    -lpulse-simple -lpulse -lpthread
 //
 // Usage:
 //   pm_stream --stream 80x40 --mode ascii  [--preset random|N]
