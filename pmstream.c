@@ -779,7 +779,7 @@ int main(int argc, char **argv)
         if (H < 1)
                 H = 1;
         if (fps <= 0)
-                fps = (mode == MODE_SIXELS) ? 30 : 30;
+                fps = (mode == MODE_SIXELS) ? 24 : 30;
 
         if (!preset_dir) {
                 static char home_dir[512];
