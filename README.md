@@ -2,7 +2,7 @@
 
 Run [projectM](https://github.com/projectM-visualizer/projectm) winamp style visualizations in the terminal or inside kew.
 
-[Watch the demo on YouTube](https://www.youtube.com/watch?v=ogAKuaRk7aU)
+[Watch the demo on YouTube](https://www.youtube.com/watch?v=ksNUZYZyRJA)
 
 <div align="center">
     <img src="images/screenshot.png" alt="ProjectM running in the terminal using pmstream" />
