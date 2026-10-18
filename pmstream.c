@@ -913,8 +913,13 @@ int main(int argc, char **argv)
 
         audio_stop();
 
+        projectm_playlist_set_preset_switched_event_callback(pl, NULL, NULL);
         projectm_playlist_destroy(pl);
+
+        pthread_mutex_lock(&g_audio_lock); // make sure the thread can't touch g_pm
         projectm_destroy(g_pm);
+        g_pm = NULL;
+        pthread_mutex_unlock(&g_audio_lock);
 
         if (mode == MODE_SIXELS)
                 sixel_shutdown();
@@ -923,5 +928,6 @@ int main(int argc, char **argv)
         free(px);
         free(g_buf);
 
-        return 0;
+        fflush(out);
+        _exit(0);
 }
