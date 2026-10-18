@@ -27,6 +27,9 @@ Run install_linux.sh. This will install projectM, Cream of the Crop Preset Pack 
 If you installed kew first you'll have the necessary dependencies like chafa, otherwise install chafa.
 
 ```sh
+sudo apt install libegl-dev pkg-config cmake libglib2.0-dev libpulse-
+dev libchafa-dev # or equivalent - this is for debian
+
 git clone https://codeberg.org/ravachol/pmstream.git
 
 cd pmstream
