@@ -4,25 +4,28 @@ project('pmstream', 'c',
 )
 
 fs = import('fs')
+cc = meson.get_compiler('c')
+
+pm_dirs = ['/usr/local/lib', '/usr/local/lib64']
 
 deps = [
   dependency('chafa'),
-  dependency('projectM-4'),
-  dependency('projectM-4-playlist'),
   dependency('egl'),
   dependency('gl'),
   dependency('libpulse-simple'),
   dependency('libpulse'),
   dependency('threads'),
+  cc.find_library('projectM-4', dirs: pm_dirs),
+  cc.find_library('projectM-4-playlist', dirs: pm_dirs),
 ]
 
 executable('pmstream', 'pmstream.c',
   dependencies: deps,
-  install: true,                                  # -> <prefix>/bin
-  install_rpath: get_option('projectm_rpath'),    # same as -Wl,-rpath,/usr/local/lib
+  include_directories: include_directories('/usr/local/include'),
+  install: true,
+  install_rpath: get_option('projectm_rpath'),
 )
 
-# Presets: install the cloned repo if it is present
 presets_src = 'presets-cream-of-the-crop'
 if get_option('install_presets') and fs.is_dir(presets_src)
   install_subdir(presets_src,
