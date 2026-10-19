@@ -479,7 +479,7 @@ static size_t encode_sixel(const uint8_t *px, int PW, int PH, const char *info)
                 g_buf[n++] = '8'; // restore cursor to origin
 
                 if (is_kitty)
-                        n += (size_t)sprintf(g_buf + n, "\033[%dB\033[%dX", g_rows - 1); // down to last row
+                        n += (size_t)sprintf(g_buf + n, "\033[%dB\033[%dX", g_rows - 1, g_cols);// down to last row
                 else
                         n += (size_t)sprintf(g_buf + n, "\033[%dB", g_rows - 1); // down to last row
 
