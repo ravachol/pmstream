@@ -18,23 +18,23 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
-// Build (Linux):
-// gcc -O2 -o pmstream pmstream.c \
-//    -I/usr/local/include $(pkg-config --cflags --libs chafa) \
-//    -L/usr/local/lib -Wl,-rpath,/usr/local/lib \
-//    -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL \
-//    -lpulse-simple -lpulse -lpthread
-//
-// Usage:
-//   pm_stream --stream 80x40 --mode ascii  [--preset random|N]
-//   [--preset-interval 60] pm_stream --stream 80x40 --mode sixels [--cell-size
-//   8x16] [--fps 15] [--audio-device NAME] [--presets DIR]
-//   pm_stream ... [--sendinfo]   show "author - preset" on the last row for 3s after each preset change
-//   pm_stream --list-devices
-//
-// Frame protocol: one frame per block, terminated by "\n\n".
-//   ascii : rows separated by '\n', ANSI color per cell
-//   sixels: one DCS sixel sequence (all newlines stripped) + "\n\n"
+/* Build (Linux):
+gcc -O2 -o pmstream pmstream.c \
+   -I/usr/local/include $(pkg-config --cflags --libs chafa) \
+   -L/usr/local/lib -Wl,-rpath,/usr/local/lib \
+   -lprojectM-4-playlist -lprojectM-4 -lEGL -lGL \
+   -lpulse-simple -lpulse -lpthread
+
+Usage:
+  pm_stream --stream 80x40 --mode ascii  [--preset random|N]
+  [--preset-interval 60] pm_stream --stream 80x40 --mode sixels [--cell-size
+  8x16] [--fps 15] [--audio-device NAME] [--presets DIR]
+  pm_stream ... [--sendinfo]   show "author - preset" on the last row for 3s after each preset change
+  pm_stream --list-devices
+
+Frame protocol: one frame per block, terminated by "\n\n".
+  ascii : rows separated by '\n', ANSI color per cell
+  sixels: one DCS sixel sequence (all newlines stripped) + "\n\n" */
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -190,7 +190,7 @@ static size_t encode_ascii(const uint8_t *px, int W, int H, char *out,
         size_t n = 0;
         int last = info ? 1 : 0; // skip bottom pixel row when showing info
 
-        for (int y = H - 1; y >= 0; y--) {
+        for (int y = H - 1; y >= last; y--) {
                 const uint8_t *row = px + (size_t)y * W * 4;
                 int pr = -1, pg = -1, pb = -1;
 
