@@ -1,5 +1,6 @@
 project('pmstream', 'c',
   version: '0.1.0',
+  meson_version: '>= 1.1.0',
   default_options: ['c_std=gnu11', 'buildtype=release', 'optimization=2'],
 )
 
