@@ -1,0 +1,4 @@
+option('projectm_rpath', type: 'string', value: '/usr/local/lib',
+  description: 'Runtime library path embedded in pmstream')
+option('install_presets', type: 'boolean', value: true,
+  description: 'Install presets-cream-of-the-crop if checked out next to meson.build')

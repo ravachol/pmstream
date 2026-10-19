@@ -15,25 +15,33 @@ Run projectm headless and stream the rendered frames to stdout as ASCII or sixel
 
 No window is needed: pmstream renders offscreen through a surfaceless EGL context, listens to an audio input device, and writes each frame to stdout.
 
-FOR NOW THIS WORKS IN LINUX ONLY.
-
-THIS WORKS WITH KEW 4.4.2 OR MANUAL BUILD OF KEW FROM THE MAIN REPO.
+THIS WORKS AS STANDALONE OR WITH KEW 4.4.2 OR MANUAL BUILD OF KEW FROM THE MAIN REPO.
 
 
 ## How to install
 
-Run install_linux.sh. This will install projectM, Cream of the Crop Preset Pack and pmstream.
+This only works in linux for now.
 
-If you installed kew first you'll have the necessary dependencies like chafa, otherwise install chafa (right now the best way is to install it from the master if you are on debian: https://github.com/hpjansson/chafa/).
+1. First install meson. Here are commands for some distros
 
 ```sh
-sudo apt install libegl-dev pkg-config cmake libglib2.0-dev libpulse-dev  # or equivalent - this is for debian
+# Debian / Ubuntu / Mint
+sudo apt install meson ninja-build
 
-git clone https://codeberg.org/ravachol/pmstream.git
+# Fedora / RHEL / Rocky
+sudo dnf install meson ninja-build
 
-cd pmstream
+# Arch / Manjaro
+sudo pacman -S meson ninja
+```
 
-./install_linux.sh
+2. Run the following commands. They will install projectM, Cream of the Crop Preset Pack and pmstream.
+
+```sh
+./setup-deps.sh
+meson setup build
+meson compile -C build
+sudo meson install -C build
 ```
 
 If used with kew 4.4.2 or later, your default visualization plugin will now be pmstream and you can run it and cycle presets by pressing c in track view. Press b to turn it off.
