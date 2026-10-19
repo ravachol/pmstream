@@ -22,22 +22,25 @@ THIS WORKS AS STANDALONE OR WITH KEW 4.4.2 OR MANUAL BUILD OF KEW FROM THE MAIN 
 
 This only works in linux for now.
 
-1. First install meson. Here are commands for some distros
+1. First install dependencies. Here are commands for some distros
 
 ```sh
 # Debian / Ubuntu / Mint
-sudo apt install meson ninja-build
+sudo apt install build-essential git pkg-config cmake meson ninja-build \
+  libchafa-dev libegl-dev libgl-dev libpulse-dev libglib2.0-dev 
 
 # Fedora / RHEL / Rocky
-sudo dnf install meson ninja-build
+sudo dnf install gcc gcc-c++ git pkgconf-pkg-config cmake meson ninja-build \
+  chafa-devel mesa-libEGL-devel mesa-libGL-devel pulseaudio-libs-devel
 
 # Arch / Manjaro
-sudo pacman -S meson ninja
+sudo pacman -S base-devel git cmake meson ninja chafa mesa libglvnd libpulse
 ```
 
 2. Run the following commands. They will install projectM, Cream of the Crop Preset Pack and pmstream.
 
 ```sh
+chmod +x setup-deps.sh
 ./setup-deps.sh
 meson setup build
 meson compile -C build
