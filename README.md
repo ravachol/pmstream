@@ -5,7 +5,7 @@ Run [projectM](https://github.com/projectM-visualizer/projectm) winamp style vis
 [Watch the demo on YouTube](https://www.youtube.com/watch?v=ksNUZYZyRJA)
 
 <div align="center">
-    <img src="images/screen.png" alt="ProjectM running in the terminal using pmstream" />
+    <img src="images/pmstream.png" alt="ProjectM running in the terminal using pmstream" />
 </div>
 <br /><br />
 
