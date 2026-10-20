@@ -5,7 +5,7 @@ Run [projectM](https://github.com/projectM-visualizer/projectm) winamp style vis
 [Watch the demo on YouTube](https://www.youtube.com/watch?v=ksNUZYZyRJA)
 
 <div align="center">
-    <img src="images/screenshot.png" alt="ProjectM running in the terminal using pmstream" />
+    <img src="images/screen.png" alt="ProjectM running in the terminal using pmstream" />
 </div>
 <br /><br />
 
@@ -45,6 +45,12 @@ chmod +x setup-deps.sh
 meson setup build
 meson compile -C build
 sudo meson install -C build
+```
+
+3. Run pmstream
+
+```sh
+pmstream --stream 80x40 --mode sixels
 ```
 
 If used with kew 4.4.2 or later, your default visualization plugin will now be pmstream and you can run it and cycle presets by pressing c in track view. Press b to turn it off.
