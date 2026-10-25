@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## pmstream 0.2
+
+- Improved installation instructions.
+
 ## pmstream 0.1
 
 - Initial version. pmstream streams projectm visuals in the terminal. It works as a standalone app from the command-line and reacts to music, or as a plugin for other apps, like kew music player.
