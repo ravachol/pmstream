@@ -46,6 +46,7 @@ Frame protocol: one frame per block, terminated by "\n\n".
 #include <GL/glext.h>
 
 #include <chafa.h>
+#include <stdbool.h>
 #include <projectM-4/playlist.h>
 #include <projectM-4/projectM.h>
 
@@ -57,7 +58,6 @@ Frame protocol: one frame per block, terminated by "\n\n".
 #include <sys/ioctl.h>
 #include <time.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 enum { MODE_ASCII = 0,
        MODE_SIXELS = 1 };
