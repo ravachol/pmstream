@@ -57,6 +57,7 @@ Frame protocol: one frame per block, terminated by "\n\n".
 #include <sys/ioctl.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 enum { MODE_ASCII = 0,
        MODE_SIXELS = 1 };
