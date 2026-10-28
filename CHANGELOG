@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## pmstream 0.1.1
+## pmstream 0.1.2
 
 - Add stdbool.h include to remove build error.
 
