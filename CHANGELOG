@@ -2,6 +2,10 @@
 
 ## pmstream 0.1.1
 
+- Add stdbool.h include to remove build error.
+
+## pmstream 0.1.1
+
 - Improved installation instructions.
 
 ## pmstream 0.1
