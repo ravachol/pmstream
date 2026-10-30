@@ -42,9 +42,7 @@ sudo pacman -S base-devel git cmake meson ninja chafa mesa libglvnd libpulse
 ```sh
 chmod +x setup-deps.sh
 ./setup-deps.sh
-meson setup build
-meson compile -C build
-sudo meson install -C build
+meson setup build --reconfigure && meson install -C build
 ```
 
 3. Run pmstream
